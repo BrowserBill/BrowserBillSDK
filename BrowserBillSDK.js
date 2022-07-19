@@ -21,31 +21,31 @@ function generateID() {
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
 
-class ExtensionBilling {
+class BrowserBill {
     constructor(id) {
         this.id = id;
         this.API_URL = `https://browserbill.com/api/ext/${id}`;
     }
 
     async getUserID() {
-        let userID = await storageGet("extensionbilling_user_id");
+        let userID = await storageGet("bb_user_id");
 
         if (userID.length > 0) {
             return userID;
         } else {
             let newUserID = generateID();
 
-            await storageSet({"extensionbilling_user_id": newUserID});
+            await storageSet({"bb_user_id": newUserID});
             return newUserID;
         }
     }
 
-    async getUserData() {
+    async getUser() {
         let userID = await this.getUserID();
         let userData = await fetch(`${this.API_URL}/user?user_id=${userID}`);
         userData = await userData.json();
 
-        return userData;
+        return userData.result;
     }
 
     async openPaymentPage(planID) {
@@ -118,11 +118,5 @@ class ExtensionBilling {
         }
 
         return logoutData.success;
-    }
-
-    async getUser() {
-        let userData = await this.getUserData();
-
-        return userData.data;
     }
 }
